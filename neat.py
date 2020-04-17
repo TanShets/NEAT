@@ -47,6 +47,8 @@ class Genome:
 	def __init__(self, nodes, genes): #Contains a list of nodes and genes
 		self.nodes = nodes
 		self.genes = genes
+		self.fitness = None
+		self.species = -1
 	
 	def findNode(num):
 		for i in self.nodes:
@@ -141,35 +143,10 @@ class Genome:
 			common = None
 			if len(inn.intersection(src.intersection(out))) > 0:
 				common = list(inn.intersection(src.intersection(out)))[0] #Perfectly matching genes
-				gene2[common] = i
-			elif len(inn.intersection(src)) > 0:
-				common = list(inn.intersection(src))
-				n = len(common)
-				j = 0
-				while j < n:
-					if common[j] == None:
-						break
-					else:
-						j += 1
-				
-				if j == n:
-					gene2.append(i) #Excess gene
+				if gene2[common] == None:
+					gene2[common] = i
 				else:
-					gene2[common[j]] = i #Matching in innovation number and source
-			elif len(inn.intersection(out)) > 0:
-				common = list(inn.intersection(out))
-				n = len(common)
-				j = 0
-				while j < n:
-					if common[j] == None:
-						break
-					else:
-						j += 1
-
-				if j == n:
-					gene2.append(i) #Excess gene
-				else:
-					gene2[common[j]] = i #Matching in innovation number and destination
+					gene2.append(i)
 			else:
 				gene2.append(i) #Excess gene
 
@@ -187,6 +164,19 @@ class Genome:
 				if not nodal.get(x.out, False):
 					nodal[x.out] = True
 				child_genes.append(x)
+
+		if len(gene2) > len(gene1):
+			for i in range(len(gene1), len(gene2)):
+				x = random.randint(0, 2)
+				if x == 1:
+					x = gene2[i]
+					if not nodal.get(x.start, False):
+						nodal[x.start] = True
+
+					if not nodal.get(x.out, False):
+						nodal[x.out] = True
+
+					child_genes.append(x)
 
 		for i in child_nodes:
 			if not nodal.get(i, False):
